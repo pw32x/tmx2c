@@ -55,8 +55,8 @@ namespace tmx2c
 
         const uint TILED_FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
         const uint TILED_FLIPPED_VERTICALLY_FLAG = 0x40000000;
-        const uint GenesisFlippedHorizontallyFlag = (1 << 11);
-        const uint GenesisFlippedVerticallyFlag = (1 << 12);
+        const uint SegaMasterSystemFlippedHorizontallyFlag = (1 << 9);
+        const uint SegaMasterSystemFlippedVerticallyFlag = (1 << 10);
 
         public List<string> ActiveLayers { get; private set; }
 
