@@ -736,8 +736,6 @@ namespace tmx2c
             mDestinationSourceFile = destinationFolder + Path.GetFileNameWithoutExtension(MapName) + ".c";
             mDestinationHeaderFile = destinationFolder + Path.GetFileNameWithoutExtension(MapName) + ".h";
 
-            return true;
-
             DateTime mapFileDateTime = File.GetLastWriteTime(MapFilename);
 
             DateTime destinationSourceFileTime = File.GetLastWriteTime(mDestinationSourceFile);
@@ -911,7 +909,7 @@ namespace tmx2c
                 headerFile.WriteLine("#ifndef " + headerBlock);
                 headerFile.WriteLine("#define " + headerBlock);
                 headerFile.WriteLine("");
-                headerFile.WriteLine("#include \"maptypes.h\"");
+                headerFile.WriteLine("#include \"map_types.h\"");
                 headerFile.WriteLine("");
 
                 headerFile.WriteLine("extern const Map const " + MapName + "_map;");

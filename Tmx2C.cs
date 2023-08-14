@@ -121,7 +121,14 @@ namespace tmx2c
             if (mapsThatNeedUpdating.Count() > 0 && !Directory.Exists(DestinationFolder))
                 Directory.CreateDirectory(DestinationFolder);
 
-            ExportMaps(mapsThatNeedUpdating, DestinationFolder, null/*tileCounts*/);
+            if (mapsThatNeedUpdating.Count > 0)
+            {
+                ExportMaps(mapsThatNeedUpdating, DestinationFolder, null/*tileCounts*/);
+            }
+            else
+            {
+                Console.WriteLine("No maps need updating.");
+            }
 
             /*
             ExportScenes(sceneNamesThatNeedUpdating, 
@@ -255,7 +262,7 @@ namespace tmx2c
         {
             foreach (var mapToExport in mapsToExport)
             {
-                Console.WriteLine("Exporting Map " + mapToExport.MapName);
+                Console.WriteLine("Exporting Map: \"" + mapToExport.MapName + "\"");
                 mapToExport.Export(tileCounts);
             }
         }
