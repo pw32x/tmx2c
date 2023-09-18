@@ -953,6 +953,38 @@ namespace tmx2c
             exported.Append("\n");
         }
 
+        private void ExportMapTerrainArray(StringBuilder exported, string terrainArrayName)
+        {
+            exported.Append("\n");
+
+            int counter = 0;
+            int totalSize = MapWidth * MapHeight;
+
+            exported.Append("// array of terrain\n");
+            exported.Append("const unsigned short const " + terrainArrayName + "[" + totalSize + "] = \n");
+            exported.Append("{\n");
+            exported.Append("    ");
+
+
+            for (int loop = 0; loop < totalSize; loop++)
+            {
+                Tile tile = mTilemap[loop];
+
+                ExportTerrainType(exported, tile);
+
+                counter++;
+
+                if (counter == MapWidth)
+                {
+                    exported.Append("\n    ");
+                    counter = 0;
+                }
+            }
+
+            exported.Append("\n};\n");
+            exported.Append("\n");
+        }
+
         private void ExportStripMapArray(StringBuilder exported, string stripmapArrayName)
         {
             // unsigned short const ChooseShipScreen_map_mapstrips_data[728] = // 728
@@ -1047,7 +1079,41 @@ namespace tmx2c
 
                 tileIndex |= (tileset.TilesetIndex << 9);
 
-                uint tileAttribute = TILE_EMPTY;
+                //tileIndex -= 1;
+            }
+
+            exported.Append(tileIndex + ",");
+        }
+
+        private void ExportTerrainType(StringBuilder exported, Tile tile)
+        {
+            uint tileAttribute = TILE_EMPTY;
+            uint tileIndex = tile.Index;
+            uint originalTileIndex = tileIndex;
+
+            var tileset = tile.Tileset;
+
+            if (tileset == null)
+            {
+                tileIndex = 0; // leave tiles that come from the game object tileset as blank.
+            }
+            else
+            {
+                tileIndex -= tileset.TileIndexes.First().StartIndex - tileset.ExportStartIndex;
+
+                tileIndex -= tileset.ExportStartIndex;
+
+                // exported format of tileindex
+                // terrain_type | blockmap_index | block_index
+                // 11111           11              111111111
+                // 0 - 31          0 - 3           0 - 511
+
+                var tileAttributeString = "";
+
+                if (tileIndex < tileset.TileAttributes.Count())
+                {
+                    tileAttributeString = tileset.TileAttributes[tileIndex];
+                }
 
                 switch (tileAttributeString)
                 {
@@ -1076,15 +1142,9 @@ namespace tmx2c
                     case "slope15left4" : tileAttribute = TILE_SLOPE15LEFT4 ; break;
                     case "water": tileAttribute = TILE_WATER; break;
                 }
-
-                tileAttribute <<= 11;
-
-                tileIndex |= tileAttribute;
-
-                //tileIndex -= 1;
             }
 
-            exported.Append(tileIndex + ",");
+            exported.Append(tileAttribute + ",");
         }
 
         /*
@@ -1133,6 +1193,7 @@ namespace tmx2c
             exported.Append("{\n");
             exported.AppendLine("    MAP_RESOURCE_TYPE,");
             exported.Append("    " + tilemapArrayName + ", // metatile index map data\n");
+            exported.Append("    " + tilemapArrayName + "_terrain, // terrain\n");
             //exported.Append("    " + MapName + "_blocksets, // list of blocksets used by this map \n");
             //exported.Append("    " + MapName + "_blockset_tile_offsets, // list of block offsets in number of tiles (not blocks) used by this map \n");
             //exported.Append("    " + Tilesets.Count + ", // number of blocksets used by this map\n");
@@ -1171,6 +1232,7 @@ namespace tmx2c
             //ExportBlocksetSizes(exported, tileCounts);
 
             ExportMap(exported);
+
             //ExportStripBlockMap(exported);
 
             using (System.IO.StreamWriter sourceFile = new System.IO.StreamWriter(mDestinationSourceFile))
@@ -1240,6 +1302,8 @@ namespace tmx2c
             string mapArrayName = MapName + "_metatile_map";
 
             ExportMapArray(exported, mapArrayName);
+
+            ExportMapTerrainArray(exported, mapArrayName + "_terrain");
 
             ExportMapStruct(exported, mapArrayName);
         }

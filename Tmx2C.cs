@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -378,7 +379,8 @@ namespace tmx2c
 
             foreach (var map in maps)
             {
-                if (map.NeedsUpdate(applicationTime, gameObjectsFileTime, SourceFolder, DestinationFolder))
+                if (map.NeedsUpdate(applicationTime, gameObjectsFileTime, SourceFolder, DestinationFolder) ||
+                    Debugger.IsAttached)
                 {
                     mapsThatNeedUpdating.Add(map);
                 }
