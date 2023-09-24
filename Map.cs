@@ -961,7 +961,7 @@ namespace tmx2c
             int totalSize = MapWidth * MapHeight;
 
             exported.Append("// array of terrain\n");
-            exported.Append("const unsigned short const " + terrainArrayName + "[" + totalSize + "] = \n");
+            exported.Append("const unsigned char const " + terrainArrayName + "[" + totalSize + "] = \n");
             exported.Append("{\n");
             exported.Append("    ");
 
