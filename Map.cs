@@ -138,7 +138,7 @@ namespace tmx2c
 
                     if (tileset.IsAnimated)
                     {
-                        tileset.ExportEndIndex = tileset.ExportStartIndex + tileset.AnimationTileStride;
+                        tileset.ExportEndIndex = tileset.ExportStartIndex + 8;//tileset.AnimationTileStride;
                     }
                     else
                     {
@@ -1183,23 +1183,41 @@ namespace tmx2c
         }
         */
 
-        private void ExportMapStruct(StringBuilder exported, string tilemapArrayName)
+        private void ExportTilesetArray(StringBuilder exported)
         {
             exported.Append("\n");
-            exported.Append("extern Tileset " + Tilesets[0].TilesetName + ";\n");
+            foreach (var tileset in Tilesets)
+            {
+                exported.Append("extern ");
+                exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
+                exported.Append(" " + tileset.TilesetName + ";\n");
+            }
             exported.Append("\n");
 
+            exported.Append("\n");
+            exported.Append("const void* " + MapName + "_tilesets[" + Tilesets.Count + "] = \n");
+            exported.Append("{\n");
+
+            foreach (var tileset in Tilesets)
+            {
+                exported.Append("    &" + tileset.TilesetName + ", // ");
+                exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
+                exported.AppendLine();
+            }
+
+            exported.Append("};\n");
+            exported.Append("\n");
+        }
+
+        private void ExportMapStruct(StringBuilder exported, string tilemapArrayName)
+        {
             exported.Append("const Map const " + MapName + "_map = \n");
             exported.Append("{\n");
             exported.AppendLine("    MAP_RESOURCE_TYPE,");
             exported.Append("    " + tilemapArrayName + ", // metatile index map data\n");
             exported.Append("    " + tilemapArrayName + "_terrain, // terrain\n");
-            //exported.Append("    " + MapName + "_blocksets, // list of blocksets used by this map \n");
-            //exported.Append("    " + MapName + "_blockset_tile_offsets, // list of block offsets in number of tiles (not blocks) used by this map \n");
-            //exported.Append("    " + Tilesets.Count + ", // number of blocksets used by this map\n");
-
-            exported.Append("    &" +Tilesets[0].TilesetName + ", // 8x8 tileset\n");
-
+            exported.Append("    " + MapName + "_tilesets, // tilesets used in the map\n");
+            exported.Append("    " + Tilesets.Count + ", // number of tilesets used by this map\n");
             exported.Append("    " + MapWidth + ", // metatile map width\n");
             exported.Append("    " + MapHeight + ", // metatile map height\n");
             exported.Append("};\n");
@@ -1304,6 +1322,8 @@ namespace tmx2c
             ExportMapArray(exported, mapArrayName);
 
             ExportMapTerrainArray(exported, mapArrayName + "_terrain");
+
+            ExportTilesetArray(exported);
 
             ExportMapStruct(exported, mapArrayName);
         }

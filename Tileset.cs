@@ -35,10 +35,10 @@ namespace tmx2c
         public string TilesetName { get; set; }
 
         public bool IsAnimated { get; set; }
-        public int AnimationTime { get; set; }
-        public uint AnimationTileStride { get; set; }
-        public int AnimationTileIndex { get; internal set; }
-        public int AnimationFramesCount { get; internal set; }
+        //public int AnimationTime { get; set; }
+        //public uint AnimationTileStride { get; set; }
+        //public int AnimationTileIndex { get; internal set; }
+        //public int AnimationFramesCount { get; internal set; }
         public string Name { get; private set; }
         public uint TilesetIndex { get; internal set; } = uint.MinValue;
         public string[] TileAttributes { get; private set; }
@@ -65,8 +65,6 @@ namespace tmx2c
 
                 if (childNode.Name == "properties")
                 {
-                    int setValuesCount = 0;
-
                     for (int propertiesNodeLoop = 0; propertiesNodeLoop < childNode.ChildNodes.Count; propertiesNodeLoop++)
                     {
                         XmlNode propertyNode = childNode.ChildNodes[propertiesNodeLoop];
@@ -81,53 +79,15 @@ namespace tmx2c
                                     if (int.TryParse(propertyNode.Attributes["value"].Value, out animated))
                                     {
                                         IsAnimated = (animated > 0);
-                                        setValuesCount++;
                                     }
 
                                     break;
                                 }
-                            case "animationtime":
-                                {
-                                    int animationTime;
-                                    if (int.TryParse(propertyNode.Attributes["value"].Value, out animationTime))
-                                    {
-                                        AnimationTime = animationTime;
-                                        setValuesCount++;
-                                    }
-                                    break;
-                                }
-                            case "stride":
-                                {
-                                    uint animationStride;
-                                    if (uint.TryParse(propertyNode.Attributes["value"].Value, out animationStride))
-                                    {
-                                        AnimationTileStride = animationStride;
-                                        setValuesCount++;
-                                    }
-                                    break;
-                                }
+
                             default:
                                 throw new Exception("no attribute by that name exists: " + attributeName);
                         }
                     }
-
-                    if (setValuesCount != 3)
-                    {
-                        Console.WriteLine("tileset has animation information but not all variables have been set. Using default values.");
-                    }
-                }
-
-                if (childNode.Name == "image" && IsAnimated)
-                {
-                    int width = 0;
-                    int.TryParse(childNode.Attributes["width"].Value, out width);
-
-                    int height = 0;
-                    int.TryParse(childNode.Attributes["height"].Value, out height);
-
-                    AnimationFramesCount = (width / 8) * (height / 8) / (int)AnimationTileStride;
-
-                    Name = Path.GetFileNameWithoutExtension(childNode.Attributes["source"].Value);
                 }
 
                 if (childNode.Name == "tile")
