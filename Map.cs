@@ -1041,6 +1041,7 @@ namespace tmx2c
 
         private void ExportTile(StringBuilder exported, Tile tile)
         {
+            uint tileAttribute = TILE_EMPTY;
             uint tileIndex = tile.Index;
             uint originalTileIndex = tileIndex;
 
@@ -1070,6 +1071,10 @@ namespace tmx2c
                 // 11111           11              111111111
                 // 0 - 31          0 - 3           0 - 511
 
+                // tileset index
+                uint tilesetIndex = (tileset.TilesetIndex << 9);
+
+                // tile attribute
                 var tileAttributeString = "";
 
                 if (tileIndex < tileset.TileAttributes.Count())
@@ -1077,7 +1082,36 @@ namespace tmx2c
                     tileAttributeString = tileset.TileAttributes[tileIndex];
                 }
 
-                tileIndex |= (tileset.TilesetIndex << 9);
+
+                switch (tileAttributeString)
+                {
+                    case "solid": tileAttribute = TILE_SOLID; break;
+                    case "topsolid": tileAttribute = TILE_TOPSOLID; break;
+                    case "climb": tileAttribute = TILE_CLIMB; break;
+                    case "hurt": tileAttribute = TILE_HURT; break;
+                    case "slope45right": tileAttribute = TILE_SLOPE45RIGHT; break;
+                    case "slope45left": tileAttribute = TILE_SLOPE45LEFT; break;
+                    case "slope30right1": tileAttribute = TILE_SLOPE30RIGHT1; break;
+                    case "slope30right2": tileAttribute = TILE_SLOPE30RIGHT2; break;
+                    case "slope30left1": tileAttribute = TILE_SLOPE30LEFT1; break;
+                    case "slope30left2": tileAttribute = TILE_SLOPE30LEFT2; break;
+                    case "slope45rightflat": tileAttribute = TILE_SLOPE45RIGHTFLAT; break;
+                    case "slope45leftflat": tileAttribute = TILE_SLOPE45LEFTFLAT; break;
+                    case "slope30rightflat": tileAttribute = TILE_SLOPE30RIGHTFLAT; break;
+                    case "slope30leftflat": tileAttribute = TILE_SLOPE30LEFTFLAT; break;
+                    case "slopehalfheight": tileAttribute = TILE_SLOPEHALFHEIGHT; break;
+                    case "slope15right1": tileAttribute = TILE_SLOPE15RIGHT1; break;
+                    case "slope15right2": tileAttribute = TILE_SLOPE15RIGHT2; break;
+                    case "slope15right3": tileAttribute = TILE_SLOPE15RIGHT3; break;
+                    case "slope15right4": tileAttribute = TILE_SLOPE15RIGHT4; break;
+                    case  "slope15left1": tileAttribute = TILE_SLOPE15LEFT1 ; break;
+                    case  "slope15left2": tileAttribute = TILE_SLOPE15LEFT2 ; break;
+                    case "slope15left3" : tileAttribute = TILE_SLOPE15LEFT3 ; break;
+                    case "slope15left4" : tileAttribute = TILE_SLOPE15LEFT4 ; break;
+                    case "water": tileAttribute = TILE_WATER; break;
+                }
+
+                tileIndex |= (tileAttribute << 11) | tilesetIndex;
 
                 //tileIndex -= 1;
             }
@@ -1215,7 +1249,7 @@ namespace tmx2c
             exported.Append("{\n");
             exported.AppendLine("    MAP_RESOURCE_TYPE,");
             exported.Append("    " + tilemapArrayName + ", // metatile index map data\n");
-            exported.Append("    " + tilemapArrayName + "_terrain, // terrain\n");
+            //exported.Append("    " + tilemapArrayName + "_terrain, // terrain\n");
             exported.Append("    " + MapName + "_tilesets, // tilesets used in the map\n");
             exported.Append("    " + Tilesets.Count + ", // number of tilesets used by this map\n");
             exported.Append("    " + MapWidth + ", // metatile map width\n");
@@ -1321,7 +1355,7 @@ namespace tmx2c
 
             ExportMapArray(exported, mapArrayName);
 
-            ExportMapTerrainArray(exported, mapArrayName + "_terrain");
+            //ExportMapTerrainArray(exported, mapArrayName + "_terrain");
 
             ExportTilesetArray(exported);
 

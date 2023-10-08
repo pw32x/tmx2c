@@ -35,6 +35,7 @@ namespace tmx2c
         public string TilesetName { get; set; }
 
         public bool IsAnimated { get; set; }
+        public bool IsBreakable { get; set; }
         public uint NumTilesPerFrame { get; set; }
         //public int AnimationTime { get; set; }
         //public uint AnimationTileStride { get; set; }
@@ -90,6 +91,16 @@ namespace tmx2c
                                     if (uint.TryParse(propertyNode.Attributes["value"].Value, out numtilesperframe))
                                     {
                                         NumTilesPerFrame = numtilesperframe;
+                                    }
+
+                                    break;
+                                }
+                            case "breakable":
+                                {
+                                    int breakable;
+                                    if (int.TryParse(propertyNode.Attributes["value"].Value, out breakable))
+                                    {
+                                        IsBreakable = (breakable > 0);
                                     }
 
                                     break;
