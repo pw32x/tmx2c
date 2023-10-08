@@ -1278,7 +1278,7 @@ namespace tmx2c
                 exported.Append("    " + offset + ",\n");
 
                 if (tileset.IsAnimated)
-                    offset += 4;
+                    offset += tileset.NumTilesPerFrame;
                 else
                     offset += (uint)tileCounts[tilesetName].Item1;
             }

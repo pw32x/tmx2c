@@ -35,6 +35,7 @@ namespace tmx2c
         public string TilesetName { get; set; }
 
         public bool IsAnimated { get; set; }
+        public uint NumTilesPerFrame { get; set; }
         //public int AnimationTime { get; set; }
         //public uint AnimationTileStride { get; set; }
         //public int AnimationTileIndex { get; internal set; }
@@ -83,7 +84,16 @@ namespace tmx2c
 
                                     break;
                                 }
+                            case "numtilesperframe":
+                                {
+                                    uint numtilesperframe;
+                                    if (uint.TryParse(propertyNode.Attributes["value"].Value, out numtilesperframe))
+                                    {
+                                        NumTilesPerFrame = numtilesperframe;
+                                    }
 
+                                    break;
+                                }
                             default:
                                 throw new Exception("no attribute by that name exists: " + attributeName);
                         }
