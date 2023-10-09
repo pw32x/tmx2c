@@ -953,38 +953,6 @@ namespace tmx2c
             exported.Append("\n");
         }
 
-        private void ExportMapTerrainArray(StringBuilder exported, string terrainArrayName)
-        {
-            exported.Append("\n");
-
-            int counter = 0;
-            int totalSize = MapWidth * MapHeight;
-
-            exported.Append("// array of terrain\n");
-            exported.Append("const unsigned char const " + terrainArrayName + "[" + totalSize + "] = \n");
-            exported.Append("{\n");
-            exported.Append("    ");
-
-
-            for (int loop = 0; loop < totalSize; loop++)
-            {
-                Tile tile = mTilemap[loop];
-
-                ExportTerrainType(exported, tile);
-
-                counter++;
-
-                if (counter == MapWidth)
-                {
-                    exported.Append("\n    ");
-                    counter = 0;
-                }
-            }
-
-            exported.Append("\n};\n");
-            exported.Append("\n");
-        }
-
         private void ExportStripMapArray(StringBuilder exported, string stripmapArrayName)
         {
             // unsigned short const ChooseShipScreen_map_mapstrips_data[728] = // 728
@@ -1012,7 +980,7 @@ namespace tmx2c
             exported.Append("\n");
         }
 
-        // this has to match the ones in Collisions.h
+        // this has to match the ones in the game engine
         const int TILE_EMPTY = 0;
         const int TILE_SOLID = 1;
         const int TILE_TOPSOLID = 2;
@@ -1024,20 +992,7 @@ namespace tmx2c
         const int TILE_SLOPE30RIGHT2 = 8;
         const int TILE_SLOPE30LEFT1 = 9;
         const int TILE_SLOPE30LEFT2 = 10;
-        const int TILE_SLOPE45RIGHTFLAT = 11;
-        const int TILE_SLOPE45LEFTFLAT = 12;
-        const int TILE_SLOPE30RIGHTFLAT = 13;
-        const int TILE_SLOPE30LEFTFLAT = 14;
-        const int TILE_SLOPEHALFHEIGHT = 15;
-        const int TILE_SLOPE15RIGHT1 = 16;
-        const int TILE_SLOPE15RIGHT2 = 17;
-        const int TILE_SLOPE15RIGHT3 = 18;
-        const int TILE_SLOPE15RIGHT4 = 19;
-        const int TILE_SLOPE15LEFT1 = 20;
-        const int TILE_SLOPE15LEFT2 = 21;
-        const int TILE_SLOPE15LEFT3 = 22;
-        const int TILE_SLOPE15LEFT4 = 23;
-        const int TILE_WATER = 24;
+        const int TILE_WATER = 11;
 
         private void ExportTile(StringBuilder exported, Tile tile)
         {
@@ -1066,10 +1021,10 @@ namespace tmx2c
 
                 tileIndex -= tileset.ExportStartIndex;
 
-                // exported format of tileindex
-                // terrain_type | blockmap_index | block_index
-                // 11111           11              111111111
-                // 0 - 31          0 - 3           0 - 511
+                // exported format of map values
+                // tile_type     | blockmap_index | block_index
+                // 1111            111              111111111
+                // 0 - 15          0 - 7            0 - 511
 
                 // tileset index
                 uint tilesetIndex = (tileset.TilesetIndex << 9);
@@ -1095,91 +1050,17 @@ namespace tmx2c
                     case "slope30right2": tileAttribute = TILE_SLOPE30RIGHT2; break;
                     case "slope30left1": tileAttribute = TILE_SLOPE30LEFT1; break;
                     case "slope30left2": tileAttribute = TILE_SLOPE30LEFT2; break;
-                    case "slope45rightflat": tileAttribute = TILE_SLOPE45RIGHTFLAT; break;
-                    case "slope45leftflat": tileAttribute = TILE_SLOPE45LEFTFLAT; break;
-                    case "slope30rightflat": tileAttribute = TILE_SLOPE30RIGHTFLAT; break;
-                    case "slope30leftflat": tileAttribute = TILE_SLOPE30LEFTFLAT; break;
-                    case "slopehalfheight": tileAttribute = TILE_SLOPEHALFHEIGHT; break;
-                    case "slope15right1": tileAttribute = TILE_SLOPE15RIGHT1; break;
-                    case "slope15right2": tileAttribute = TILE_SLOPE15RIGHT2; break;
-                    case "slope15right3": tileAttribute = TILE_SLOPE15RIGHT3; break;
-                    case "slope15right4": tileAttribute = TILE_SLOPE15RIGHT4; break;
-                    case  "slope15left1": tileAttribute = TILE_SLOPE15LEFT1 ; break;
-                    case  "slope15left2": tileAttribute = TILE_SLOPE15LEFT2 ; break;
-                    case "slope15left3" : tileAttribute = TILE_SLOPE15LEFT3 ; break;
-                    case "slope15left4" : tileAttribute = TILE_SLOPE15LEFT4 ; break;
                     case "water": tileAttribute = TILE_WATER; break;
                 }
 
-                tileIndex |= (tileAttribute << 11) | tilesetIndex;
+                tileIndex |= (tileAttribute << 12) | tilesetIndex;
 
                 //tileIndex -= 1;
             }
 
             exported.Append(tileIndex + ",");
         }
-
-        private void ExportTerrainType(StringBuilder exported, Tile tile)
-        {
-            uint tileAttribute = TILE_EMPTY;
-            uint tileIndex = tile.Index;
-            uint originalTileIndex = tileIndex;
-
-            var tileset = tile.Tileset;
-
-            if (tileset == null)
-            {
-                tileIndex = 0; // leave tiles that come from the game object tileset as blank.
-            }
-            else
-            {
-                tileIndex -= tileset.TileIndexes.First().StartIndex - tileset.ExportStartIndex;
-
-                tileIndex -= tileset.ExportStartIndex;
-
-                // exported format of tileindex
-                // terrain_type | blockmap_index | block_index
-                // 11111           11              111111111
-                // 0 - 31          0 - 3           0 - 511
-
-                var tileAttributeString = "";
-
-                if (tileIndex < tileset.TileAttributes.Count())
-                {
-                    tileAttributeString = tileset.TileAttributes[tileIndex];
-                }
-
-                switch (tileAttributeString)
-                {
-                    case "solid": tileAttribute = TILE_SOLID; break;
-                    case "topsolid": tileAttribute = TILE_TOPSOLID; break;
-                    case "climb": tileAttribute = TILE_CLIMB; break;
-                    case "hurt": tileAttribute = TILE_HURT; break;
-                    case "slope45right": tileAttribute = TILE_SLOPE45RIGHT; break;
-                    case "slope45left": tileAttribute = TILE_SLOPE45LEFT; break;
-                    case "slope30right1": tileAttribute = TILE_SLOPE30RIGHT1; break;
-                    case "slope30right2": tileAttribute = TILE_SLOPE30RIGHT2; break;
-                    case "slope30left1": tileAttribute = TILE_SLOPE30LEFT1; break;
-                    case "slope30left2": tileAttribute = TILE_SLOPE30LEFT2; break;
-                    case "slope45rightflat": tileAttribute = TILE_SLOPE45RIGHTFLAT; break;
-                    case "slope45leftflat": tileAttribute = TILE_SLOPE45LEFTFLAT; break;
-                    case "slope30rightflat": tileAttribute = TILE_SLOPE30RIGHTFLAT; break;
-                    case "slope30leftflat": tileAttribute = TILE_SLOPE30LEFTFLAT; break;
-                    case "slopehalfheight": tileAttribute = TILE_SLOPEHALFHEIGHT; break;
-                    case "slope15right1": tileAttribute = TILE_SLOPE15RIGHT1; break;
-                    case "slope15right2": tileAttribute = TILE_SLOPE15RIGHT2; break;
-                    case "slope15right3": tileAttribute = TILE_SLOPE15RIGHT3; break;
-                    case "slope15right4": tileAttribute = TILE_SLOPE15RIGHT4; break;
-                    case  "slope15left1": tileAttribute = TILE_SLOPE15LEFT1 ; break;
-                    case  "slope15left2": tileAttribute = TILE_SLOPE15LEFT2 ; break;
-                    case "slope15left3" : tileAttribute = TILE_SLOPE15LEFT3 ; break;
-                    case "slope15left4" : tileAttribute = TILE_SLOPE15LEFT4 ; break;
-                    case "water": tileAttribute = TILE_WATER; break;
-                }
-            }
-
-            exported.Append(tileAttribute + ",");
-        }
+        
 
         /*
         private void ExportCollisionMap(StringBuilder exported, string collisionMapArrayName)
@@ -1354,8 +1235,6 @@ namespace tmx2c
             string mapArrayName = MapName + "_metatile_map";
 
             ExportMapArray(exported, mapArrayName);
-
-            //ExportMapTerrainArray(exported, mapArrayName + "_terrain");
 
             ExportTilesetArray(exported);
 
