@@ -25,6 +25,7 @@ namespace tmx2c
         private string TmxExtension = "tmx";
 
         private string DestinationFolder;
+        private string Bank = "";
 
         public Tmx2CRunner(string [] args)
         {
@@ -46,6 +47,9 @@ namespace tmx2c
 
             if (!String.IsNullOrEmpty(DestinationFolder) && !DestinationFolder.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 DestinationFolder += Path.DirectorySeparatorChar;
+
+            if (args.Length > 2)
+                Bank = args[2].Substring("-".Length).ToUpper();
         }
 
         public int Run()
@@ -124,7 +128,7 @@ namespace tmx2c
 
             if (mapsThatNeedUpdating.Count > 0)
             {
-                ExportMaps(mapsThatNeedUpdating, DestinationFolder, null/*tileCounts*/);
+                ExportMaps(mapsThatNeedUpdating, DestinationFolder, null/*tileCounts*/, Bank);
             }
             else
             {
@@ -259,12 +263,13 @@ namespace tmx2c
 
         private void ExportMaps(List<Map> mapsToExport, 
                                 string mapsExportLocation, 
-                                Dictionary<string, Tuple<int, int, int>> tileCounts)
+                                Dictionary<string, Tuple<int, int, int>> tileCounts,
+                                string bank)
         {
             foreach (var mapToExport in mapsToExport)
             {
                 Console.WriteLine("Exporting Map: \"" + mapToExport.MapName + "\"");
-                mapToExport.Export(tileCounts);
+                mapToExport.Export(tileCounts, bank);
             }
         }
 

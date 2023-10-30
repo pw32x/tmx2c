@@ -898,7 +898,7 @@ namespace tmx2c
             }
         }
 
-        public void ExportHeaderFile()
+        public void ExportHeaderFile(string bank)
         {
             // Save to header file
             using (System.IO.StreamWriter headerFile = new System.IO.StreamWriter(mDestinationHeaderFile))
@@ -912,8 +912,8 @@ namespace tmx2c
                 headerFile.WriteLine("#include \"map_types.h\"");
                 headerFile.WriteLine("");
 
-                headerFile.WriteLine("RESOURCE extern const Map const " + MapName + "_map;");
-                //headerFile.WriteLine("RESOURCE extern const StripMap const " + MapName + "_stripmap;");
+                headerFile.WriteLine("RESOURCE(" + bank + ") extern const Map const " + MapName + "_map;");
+                //headerFile.WriteLine("RESOURCE(" + bank + ") extern const StripMap const " + MapName + "_stripmap;");
 
                 headerFile.WriteLine("");
                 headerFile.WriteLine("#endif");
@@ -1103,7 +1103,7 @@ namespace tmx2c
             exported.Append("\n");
             foreach (var tileset in Tilesets)
             {
-                exported.Append("RESOURCE extern ");
+                exported.Append("extern ");
                 exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
                 exported.Append(" " + tileset.TilesetName + ";\n");
             }
@@ -1124,9 +1124,9 @@ namespace tmx2c
             exported.Append("\n");
         }
 
-        private void ExportMapStruct(StringBuilder exported, string tilemapArrayName)
+        private void ExportMapStruct(StringBuilder exported, string tilemapArrayName, string bank)
         {
-            exported.Append("const Map const " + MapName + "_map = \n");
+            exported.Append("RESOURCE(" + bank + ") const Map const " + MapName + "_map = \n");
             exported.Append("{\n");
             exported.AppendLine("    MAP_RESOURCE_TYPE,");
             exported.Append("    " + tilemapArrayName + ", // metatile index map data\n");
@@ -1154,7 +1154,7 @@ namespace tmx2c
         }
 
 
-        public void ExportSourceFile(Dictionary<string, Tuple<int, int, int>> tileCounts)
+        public void ExportSourceFile(Dictionary<string, Tuple<int, int, int>> tileCounts, string bank)
         {
             StringBuilder exported = new StringBuilder();
             ExportInclude(exported);
@@ -1164,7 +1164,7 @@ namespace tmx2c
             //ExportBlocksets(exported);
             //ExportBlocksetSizes(exported, tileCounts);
 
-            ExportMap(exported);
+            ExportMap(exported, bank);
 
             //ExportStripBlockMap(exported);
 
@@ -1230,7 +1230,7 @@ namespace tmx2c
             exported.Append("\n");
         }
 
-        private void ExportMap(StringBuilder exported)
+        private void ExportMap(StringBuilder exported, string bank)
         {
             string mapArrayName = MapName + "_metatile_map";
 
@@ -1238,7 +1238,7 @@ namespace tmx2c
 
             ExportTilesetArray(exported);
 
-            ExportMapStruct(exported, mapArrayName);
+            ExportMapStruct(exported, mapArrayName, bank);
         }
 
         private void ExportStripMap(StringBuilder exported)
@@ -1257,7 +1257,7 @@ namespace tmx2c
             exported.Append("#include \"resource_types.h\"\n");
         }
 
-        public void Export(Dictionary<string, Tuple<int, int, int>> tileCounts)
+        public void Export(Dictionary<string, Tuple<int, int, int>> tileCounts, string bank)
         {
             if (mPropertiesNode != null)
                 ParseProperties(mPropertiesNode);
@@ -1267,8 +1267,8 @@ namespace tmx2c
             if (mCollisionLayerNode != null)
                 ParseCollisionLayer(mCollisionLayerNode);
 
-            ExportHeaderFile();
-            ExportSourceFile(tileCounts);
+            ExportHeaderFile(bank);
+            ExportSourceFile(tileCounts, bank);
         }
     }
 }
