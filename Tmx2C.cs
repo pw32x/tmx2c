@@ -165,7 +165,7 @@ namespace tmx2c
             }
 
             content.AppendLine("");
-            content.AppendLine("extern const Scene* const allScenes[" + sceneNames.Count() + "];");
+            content.AppendLine("RESOURCE extern const Scene* const allScenes[" + sceneNames.Count() + "];");
             content.AppendLine("");
             content.AppendLine("#endif");
 

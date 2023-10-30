@@ -912,8 +912,8 @@ namespace tmx2c
                 headerFile.WriteLine("#include \"map_types.h\"");
                 headerFile.WriteLine("");
 
-                headerFile.WriteLine("extern const Map const " + MapName + "_map;");
-                //headerFile.WriteLine("extern const StripMap const " + MapName + "_stripmap;");
+                headerFile.WriteLine("RESOURCE extern const Map const " + MapName + "_map;");
+                //headerFile.WriteLine("RESOURCE extern const StripMap const " + MapName + "_stripmap;");
 
                 headerFile.WriteLine("");
                 headerFile.WriteLine("#endif");
@@ -1103,7 +1103,7 @@ namespace tmx2c
             exported.Append("\n");
             foreach (var tileset in Tilesets)
             {
-                exported.Append("extern ");
+                exported.Append("RESOURCE extern ");
                 exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
                 exported.Append(" " + tileset.TilesetName + ";\n");
             }
