@@ -1104,18 +1104,19 @@ namespace tmx2c
             foreach (var tileset in Tilesets)
             {
                 exported.Append("extern ");
-                exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
-                exported.Append(" " + tileset.TilesetName + ";\n");
+                //exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
+                exported.Append("ResourceInfo");
+                exported.Append(" " + tileset.TilesetName + "ResourceInfo;\n");
             }
             exported.Append("\n");
 
             exported.Append("\n");
-            exported.Append("const void* " + MapName + "_tilesets[" + Tilesets.Count + "] = \n");
+            exported.Append("const ResourceInfo* " + MapName + "_tilesetResourceInfos[" + Tilesets.Count + "] = \n");
             exported.Append("{\n");
 
             foreach (var tileset in Tilesets)
             {
-                exported.Append("    &" + tileset.TilesetName + ", // ");
+                exported.Append("    &" + tileset.TilesetName + "ResourceInfo, // ");
                 exported.Append(tileset.IsAnimated ? "AnimatedTileset" : "Tileset");
                 exported.AppendLine();
             }
@@ -1131,7 +1132,7 @@ namespace tmx2c
             exported.AppendLine("    MAP_RESOURCE_TYPE,");
             exported.Append("    " + tilemapArrayName + ", // metatile index map data\n");
             //exported.Append("    " + tilemapArrayName + "_terrain, // terrain\n");
-            exported.Append("    " + MapName + "_tilesets, // tilesets used in the map\n");
+            exported.Append("    " + MapName + "_tilesetResourceInfos, // tilesets used in the map\n");
             exported.Append("    " + Tilesets.Count + ", // number of tilesets used by this map\n");
             exported.Append("    " + MapWidth + ", // metatile map width\n");
             exported.Append("    " + MapHeight + ", // metatile map height\n");
